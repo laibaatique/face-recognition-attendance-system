@@ -1,136 +1,123 @@
-# Facial-Detection-system-
+# Face Recognition Attendance System
 
+A secure face recognition attendance system built with Python for automated attendance marking, user enrollment, and administrative management. The project uses DeepFace for facial embeddings, OpenCV for image capture and liveness checks, Flask for backend APIs, SQLite for data storage, and CustomTkinter for the admin dashboard.
 
+---
 
-# Secure Facial Recognition Attendance System
+## Features
 
-A robust, secure, and user-friendly attendance system built with Python. It utilizes **DeepFace (FaceNet512)** for high-accuracy recognition, **Flask** for the backend API, and **CustomTkinter** for a modern Admin Dashboard.
+- Face-based attendance marking  
+- User enrollment using webcam  
+- Admin dashboard for managing users and viewing logs  
+- Blink-based liveness detection (anti-spoofing)  
+- Encrypted storage of face embeddings  
+- Hashed admin credentials  
+- Attendance logging with timestamps  
+- Email alerts for after-hours attendance  
+- Maintenance mode for safe camera switching  
 
-The system features **Anti-Spoofing (Liveness Detection)**, **Encrypted Storage**, and **Anomaly Detection** via Email Alerts.
+---
 
-## 🚀 Key Features
+## Tech Stack
 
-  * **High-Accuracy Recognition:** Uses the `FaceNet512` model via DeepFace.
-  * **Liveness Detection:** Prevents photo spoofing by requiring user eye blinks before recognition.
-  * **Secure Storage:**
-      * Face embeddings are encrypted using `Fernet` (symmetric encryption).
-      * Admin passwords are hashed using `Scrypt` (via Werkzeug).
-  * **Modern Admin Dashboard:** A GUI built with `CustomTkinter` to enroll users, manage the database, and view logs.
-  * **Smart Hardware Locking:** Automatically manages camera access between the Kiosk and Admin dashboard to prevent conflicts.
-  * **Anomaly Detection:** Automatically sends email alerts to the admin if attendance is marked outside of office hours (e.g., late night).
+- **Language:** Python  
+- **Backend:** Flask, SQLite  
+- **Computer Vision:** OpenCV, DeepFace (FaceNet512)  
+- **GUI:** CustomTkinter  
+- **Security:** Cryptography (Fernet), Werkzeug  
+- **Other:** NumPy, Pillow, Requests  
 
-## 🛠️ Tech Stack
+---
 
-  * **Language:** Python 3.8+
-  * **Backend:** Flask (REST API), SQLite3
-  * **Computer Vision:** OpenCV, DeepFace
-  * **GUI:** CustomTkinter (Modern UI wrapper for Tkinter)
-  * **Security:** Cryptography (Fernet), Werkzeug (Hashing)
-  * **Utilities:** NumPy, Pillow, Requests
+## Project Structure
 
-## 📂 Project Structure
-
-```text
-Facial-Detection_Attendance-System/
+```
+face-recognition-attendance-system/
 │
-├── server.py                # The central API server (Logic, DB, Email)
-├── admin_dashboard.py       # GUI for Admin (Enrollment, Logs, Deletion)
-├── attendance_kiosk.py      # Client script for marking attendance (Camera)
-│
-├── secure_attendance.db     # Created automatically on first run
-├── requirements.txt         # List of dependencies
-└── README.md                # Project documentation
+├── server.py               # Backend API and core logic
+├── admindashboard.py       # Admin dashboard (GUI)
+├── attendance_client.py    # Attendance kiosk client
+├── enrollment_client.py    # Enrollment client
+├── README.md               # Documentation
 ```
 
-## ⚙️ Installation
+---
 
-1.  **Clone the Repository**
+## How It Works
 
-    ```bash
-    git clone https://github.com/Hassan-487/Facial-Detection_Attendance-System.git
-    cd Facial-Detection_Attendance-System
-    ```
+1. The server initializes the database and loads stored facial embeddings.  
+2. Admin logs in via dashboard to enroll users and manage records.  
+3. The attendance client captures a face and performs blink-based liveness detection.  
+4. The image is sent to the server for recognition.  
+5. If matched, attendance is recorded; otherwise, user is marked unknown.  
+6. If attendance occurs outside office hours, an email alert is triggered.  
 
-2.  **Install Dependencies**
-    It is recommended to use a virtual environment.
+---
 
-    ```bash
-    pip install flask flask-cors deepface opencv-python cryptography requests pillow werkzeug customtkinter numpy
-    ```
+## Setup Instructions
 
-## 🚦 Usage Guide
+### 1. Install Dependencies
+```bash
+pip install flask flask-cors deepface opencv-python cryptography requests pillow werkzeug customtkinter numpy
+```
 
-To run the system, you will need to open **three separate terminals**.
-
-### Step 1: Start the Server
-
-This initializes the database and listens for requests.
-
+### 2. Run the Server
 ```bash
 python server.py
 ```
 
-  * **Note:** On the first run, it creates a default admin account.
-  * **Default Credentials:** Username: `admin` | Password: `admin123`
-
-### Step 2: Open the Admin Dashboard
-
-Use this to enroll new users.
-
+### 3. Run Admin Dashboard
 ```bash
-python admin_dashboard.py
+python admindashboard.py
 ```
 
-1.  Login using the default credentials.
-2.  Go to **"Enroll User"**.
-3.  Enter a name and capture the face.
-      * *Note:* The system will automatically pause the Kiosk camera to free up hardware resources.
-
-### Step 3: Run the Attendance Kiosk
-
-This is the client-facing screen.
-
+### 4. Run Attendance Client
 ```bash
-python attendance_kiosk.py
+python attendance_client.py
 ```
 
-1.  The camera will open.
-2.  Follow the on-screen instructions (e.g., "Please Blink").
-3.  If recognized, attendance is marked. If not, it shows "Not Registered".
+---
 
-## 📧 Configuration (Optional)
+## Default Credentials
 
-To enable **Email Anomaly Detection** (alerts for after-hours attendance):
+```
+Username: admin  
+Password: admin123  
+```
 
-1.  Open `server.py`.
-2.  Find the `EMAIL CONFIGURATION` section at the top.
-3.  Update the fields:
-    ```python
-    SENDER_EMAIL = "your_email@gmail.com"
-    SENDER_PASSWORD = "your_app_password"  # Generate via Google Account > Security > App Passwords
-    ADMIN_EMAIL = "admin_email@gmail.com"
-    ```
-4.  Set your office hours:
-    ```python
-    OFFICE_START_HOUR = 9   # 9 AM
-    OFFICE_END_HOUR = 18    # 6 PM
-    ```
+⚠️ Change these credentials before using in a real environment.
 
-## ⚠️ Troubleshooting
+---
 
-**1. Camera Error: `cv2.error` or "Can't grab frame"**
+## Configuration
 
-  * Ensure you are not running `admin_dashboard.py` and `attendance_kiosk.py` camera functions at the exact same time. The "Smart Locking" feature usually handles this, but if it fails, close both scripts and restart the server.
-  * If on Windows, the code uses `cv2.CAP_DSHOW` for better compatibility.
+Update the following in `server.py` before running:
 
-**2. Email not sending**
+- Email credentials (for alerts)
+- Encryption key
+- Office hours
+- Admin email
 
-  * Ensure you are using a **Google App Password**, not your regular login password.
-  * Check your internet connection.
+---
 
-**3. "Face not detected" during enrollment**
+## Notes
 
-  * Ensure good lighting.
-  * Make sure only **one** face is visible in the frame.
+- Ensure only one application is accessing the camera at a time  
+- Good lighting improves face detection accuracy  
+- System is designed for local/demo usage  
 
+---
 
+## Future Improvements
+
+- Environment variable configuration  
+- Advanced anti-spoofing techniques  
+- Cloud database integration  
+- Role-based access control  
+- Attendance analytics dashboard  
+
+---
+
+## License
+
+This project is for educational purposes.
